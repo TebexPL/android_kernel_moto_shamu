@@ -15,15 +15,7 @@ export ARCH=arm && SUBARCH=arm;
 #replace 4 with number of threads your host CPU has
 export CORECOUNT=4;
 
-echo "PlutoniumKernel build script.";
-echo ;
-echo "Press:";
-echo "c to compile";
-echo "m to open menuconfig";
-echo "p to pack 'ready to flash' zip (compile first)";
-echo "f to test image using fastboot";
-echo "a to flash kernel zip using adb (twrp only)";
-echo "q to exit";
+
 source=$(pwd)/..;
 here=$(pwd);
 zipsrc=$here/.zip;
@@ -45,6 +37,25 @@ if [ -f $zipsrc/zImage-dtb ]; then
   rm $zipsrc/zImage-dtb 2&> /dev/null;
 fi;
 
+clear;
+echo "Preparing build environment...";
+
+cd $source;
+make clean 2&> /dev/null;
+make mrproper 2&> /dev/null;
+make plutonium_kernel_defconfig 2&> /dev/null;
+cd $here;
+
+clear;
+echo "PlutoniumKernel build script.";
+echo ;
+echo "Press:";
+echo "c to compile";
+echo "m to open menuconfig";
+echo "p to pack 'ready to flash' zip (compile first)";
+echo "f to test image using fastboot";
+echo "a to flash kernel zip using adb (twrp only)";
+echo "q to exit";
 
 while [[ $input != "q" ]]; do
   input=" ";
@@ -63,6 +74,8 @@ while [[ $input != "q" ]]; do
     clear;
     cd $source;
     make menuconfig;
+    cp .config arch/arm/configs/plutonium_kernel_defconfig
+
     cd $here;
   elif [[ $input == "p" ]]; then
     if [ -f $imgout/zImage-dtb ]; then
